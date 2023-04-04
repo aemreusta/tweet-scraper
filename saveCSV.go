@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"errors"
+	"flag"
 	"fmt"
 	"log"
 	"os"
@@ -66,14 +67,22 @@ func SearchTweets(query string, numTweets int) (*dataframe.DataFrame, error) {
 
 // Define constants
 const (
-	query     = "secim"
-	numTweets = 100
+	defaultNumTweets = 10
+	defaultQuery     = "golang"
 )
 
 // main function
 func main() {
+
+	// Define command line arguments
+	queryPtr := flag.String("q", defaultQuery, "Search Query String")
+	numTweetsPtr := flag.Int("n", defaultNumTweets, "Number of Tweets to Retrieve")
+
+	// Parse command line arguments
+	flag.Parse()
+
 	// Search for tweets
-	df, err := SearchTweets(query, numTweets)
+	df, err := SearchTweets(*queryPtr, *numTweetsPtr)
 	if err != nil {
 		// Log the error and exit gracefully
 		log.Fatalf("Error: %v", err)
@@ -84,7 +93,7 @@ func main() {
 	filename := t.Format("2006-01-02_15-04-05")
 
 	// Add query to filename
-	filename = fmt.Sprintf("%s_%s", filename, query)
+	filename = fmt.Sprintf("%s_%s", filename, *queryPtr)
 
 	// Open the file to save the dataframe
 	f, err := os.Create(fmt.Sprintf("%s.csv", filename))
